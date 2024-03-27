@@ -42,6 +42,10 @@ contract PatientRecordContract {
         emit ConsentGranted(msg.sender, providerAddress);
     }
 
+    function getConsentStatus(address patientAddress, address providerAddress) public view returns (bool) {
+        return patientProviderConsent[patientAddress][providerAddress];
+    }
+
     function revokeConsent(address providerAddress) public {
         patientProviderConsent[msg.sender][providerAddress] = false;
         emit ConsentRevoked(msg.sender, providerAddress);
