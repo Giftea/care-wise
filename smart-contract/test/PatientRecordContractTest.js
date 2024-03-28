@@ -1,77 +1,55 @@
 const { expect } = require("chai");
-const { ethers } = require("hardhat");
 
 describe("PatientRecordContract", function () {
-  let contractInstance;
-  const patient = "0x55A8661defB6b46414F2d79Bb486a115Ab28f6A3";
-  const provider = "0x9329dd1Be0D10B5D8C5C641F45de62c054272760";
+  let patientRecordContract;
+  let owner;
+  let patientAddress;
+  let provider;
 
-  beforeEach(async function () {
-    contractInstance = await ethers.deployContract("PatientRecordContract");
-    // const ContractInstance = await ethers.getContractFactory("PatientRecordContract");
-    // contractInstance = await ContractInstance.deploy();
-    // console.log(contractInstance);
-    // await contractInstance.deployed();
-  });
-
-  it("should grant consent to provider", async function () {
-    await contractInstance.grantConsent(provider, { from: patient });
-    const hasConsent = await contractInstance.patientProviderConsent(
-      patient,
-      provider
+  before(async function () {
+    patientRecordContract = await ethers.deployContract(
+      "PatientRecordContract"
     );
-    assert.equal(hasConsent, true, "Consent was not granted to provider");
+    [owner, patientAddress, provider] = await ethers.getSigners();
   });
 
-  // it("should revoke consent from provider", async function () {
-  //   await contractInstance.grantConsent(provider, { from: patient });
-  //   await contractInstance.revokeConsent(provider, { from: patient });
-  //   const hasConsent = await contractInstance.patientProviderConsent(
-  //     patient,
-  //     provider
-  //   );
-  //   assert.equal(hasConsent, false, "Consent was not revoked from provider");
-  // });
+  it("should grant consent", async function () {
+    await patientRecordContract.grantConsent(
+      patientAddress.address,
+      provider.address
+    );
+    const consentStatus = await patientRecordContract.getConsentStatus(
+      patientAddress.address,
+      provider.address
+    );
+    expect(consentStatus).to.equal(true);
+  });
 
-  // it("should update patient record with consent", async function () {
-  //   await contractInstance.grantConsent(provider, { from: patient });
-  //   await contractInstance.updateRecord(
-  //     "New medical history",
-  //     "New lab results",
-  //     "New prescriptions",
-  //     { from: patient }
-  //   );
-  //   const [medicalHistory, labResults, prescriptions] =
-  //     await contractInstance.getRecord(patient, { from: provider });
-  //   assert.equal(
-  //     medicalHistory,
-  //     "New medical history",
-  //     "Medical history not updated"
-  //   );
-  //   assert.equal(labResults, "New lab results", "Lab results not updated");
-  //   assert.equal(
-  //     prescriptions,
-  //     "New prescriptions",
-  //     "Prescriptions not updated"
-  //   );
-  // });
+  it("should update patient record", async function () {
+    await patientRecordContract.grantConsent(patientAddress.address, provider.address); // Grant consent before updating
+    await patientRecordContract.updateRecord(patientAddress.address, provider.address, "New medical history", "New lab results", "New prescriptions");
+    const [medicalHistory, labResults, prescriptions] = await patientRecordContract.getRecord(patientAddress.address, provider.address);
+    expect(medicalHistory).to.equal("New medical history");
+    expect(labResults).to.equal("New lab results");
+    expect(prescriptions).to.equal("New prescriptions");
+  });
 
-  // it("should not update patient record without consent", async function () {
-  //   await expectRevert(
-  //     contractInstance.updateRecord(
-  //       "New medical history",
-  //       "New lab results",
-  //       "New prescriptions",
-  //       { from: patient }
-  //     ),
-  //     "Patient has not granted consent to update record"
-  //   );
-  // });
+  it("should retrieve patient record", async function () {
+    const [medicalHistory, labResults, prescriptions] = await patientRecordContract.getRecord(patientAddress.address, provider.address);
+    expect(medicalHistory).to.equal("New medical history");
+    expect(labResults).to.equal("New lab results");
+    expect(prescriptions).to.equal("New prescriptions");
+  });
 
-  // it("should not access patient record without consent", async function () {
-  //   await expectRevert(
-  //     contractInstance.getRecord(patient, { from: provider }),
-  //     "Patient has not granted consent to access record"
-  //   );
-  // });
+  it("should revoke consent", async function () {
+    await patientRecordContract.revokeConsent(
+      patientAddress.address,
+      provider.address
+    );
+    const consentStatus = await patientRecordContract.getConsentStatus(
+      patientAddress.address,
+      provider.address
+    );
+    expect(consentStatus).to.equal(false);
+  });
 });
