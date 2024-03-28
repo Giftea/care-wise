@@ -1,32 +1,47 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
 contract BillingContract {
-    mapping(address => uint256) public balances;
-    mapping(address => mapping(string => uint256)) public serviceRates;
+    address public hospitalManagement;
 
-    event ServiceRateSet(address indexed provider, string service, uint256 rate);
-    event ServiceProvided(address indexed patient, address indexed provider, string service, uint256 charge);
-    event PaymentReceived(address indexed patient, uint256 amount);
-
-    function setServiceRate(string memory service, uint256 rate) public {
-        serviceRates[msg.sender][service] = rate;
-        emit ServiceRateSet(msg.sender, service, rate);
+    constructor() {
+        hospitalManagement = msg.sender;
     }
 
-    function provideService(address patient, string memory service) public {
-        require(serviceRates[msg.sender][service] > 0, "Service rate not set");
-        uint256 charge = serviceRates[msg.sender][service];
-        balances[patient] += charge;
-        emit ServiceProvided(patient, msg.sender, service, charge);
+    struct Service {
+        string serviceName;
+        uint256 serviceRate; // Rate of the service in wei
     }
 
-    function makePayment() public payable {
-        require(balances[msg.sender] > 0, "No outstanding balance");
-        require(msg.value >= balances[msg.sender], "Insufficient payment");
-        uint256 amount = balances[msg.sender];
-        balances[msg.sender] = 0;
-        payable(msg.sender).transfer(amount);
-        emit PaymentReceived(msg.sender, amount);
+    mapping(string => Service) private services;
+
+    event ServiceRateSet(string serviceName, uint256 serviceRate);
+    event PaymentReceived(address indexed payer, string serviceName, uint256 amount);
+
+    modifier onlyHospitalManagement() {
+        require(msg.sender == hospitalManagement, "Only the hospital manager can call this function");
+        _;
+    }
+
+    function setServiceRate(string memory serviceName, uint256 serviceRate) public onlyHospitalManagement {
+        services[serviceName].serviceName = serviceName;
+        services[serviceName].serviceRate = serviceRate;
+        emit ServiceRateSet(serviceName, serviceRate);
+    }
+
+    function getServiceRate(string memory serviceName) public view returns (uint256) {
+        return services[serviceName].serviceRate;
+    }
+
+    function makePayment(string memory serviceName) public payable {
+        uint256 serviceRate = services[serviceName].serviceRate;
+        require(serviceRate > 0, "Service rate not set");
+
+        require(msg.value >= serviceRate, "Insufficient payment");
+
+        // Transfer payment to hospital management
+        payable(hospitalManagement).transfer(msg.value);
+
+        emit PaymentReceived(msg.sender, serviceName, msg.value);
     }
 }
