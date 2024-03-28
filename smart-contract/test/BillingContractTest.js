@@ -3,52 +3,41 @@ const { expect } = require("chai");
 describe("BillingContract", function () {
   let billingContract;
   let owner;
-  let provider;
-  let patient;
+  let payer;
 
-  before(async function () {
+  beforeEach(async function () {
     billingContract = await ethers.deployContract("BillingContract");
-    [owner, provider, patient] = await ethers.getSigners();
+
+    [owner, payer] = await ethers.getSigners();
   });
 
   it("should set service rate", async function () {
     await billingContract
-      .connect(provider)
-      .setServiceRate("Consultation", ethers.parseEther("1"));
-    const rate = await billingContract.serviceRates(
-      provider.address,
-      "Consultation"
+      .connect(owner)
+      .setServiceRate("Consultation", ethers.parseEther("0.1"));
+    const serviceRate = await billingContract.getServiceRate("Consultation");
+    expect(serviceRate).to.equal(ethers.parseEther("0.1"));
+  });
+
+  it("should make payment and emit PaymentReceived event", async function () {
+    await billingContract
+      .connect(owner)
+      .setServiceRate("Consultation", ethers.parseEther("0.1"));
+
+    const initialBalance = await ethers.provider.getBalance(payer.address);
+    const paymentAmount = ethers.parseEther("0.1");
+    const tx = await billingContract
+      .connect(payer)
+      .makePayment("Consultation", { value: paymentAmount });
+    expect(tx)
+      .to.emit(billingContract, "PaymentReceived")
+      .withArgs(payer, "Consultation", paymentAmount);
+
+    const newBalance = await ethers.provider.getBalance(payer.address);
+    const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
+
+    expect(newBalance).to.equal(
+      initialBalance - (paymentAmount + receipt.gasUsed * tx.gasPrice)
     );
-    expect(rate).to.equal(ethers.parseEther("1"));
-  });
-
-  it("should provide service and update balance", async function () {
-    await billingContract
-      .connect(provider)
-      .provideService(patient.address, "Consultation");
-    const balance = await billingContract.balances(patient.address);
-    expect(balance).to.equal(ethers.parseEther("1"));
-  });
-
-  it("should make payment and clear balance", async function () {
-    // Set service rate and provide service to patient
-    await billingContract
-      .connect(provider)
-      .setServiceRate("Consultation", ethers.parseEther("1"));
-    await billingContract
-      .connect(provider)
-      .provideService(patient.address, "Consultation");
-
-    // Get the outstanding balance of the patient
-    const balanceBefore = await billingContract.balances(patient.address);
-
-    // Make payment with an amount equal to or greater than the outstanding balance
-    await billingContract
-      .connect(patient)
-      .makePayment({ value: balanceBefore });
-
-    // Verify that the balance is cleared after payment
-    const balanceAfter = await billingContract.balances(patient.address);
-    expect(balanceAfter).to.equal(0);
   });
 });
