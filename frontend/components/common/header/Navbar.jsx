@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { ConnectKitButton } from "connectkit";
 
 const Navbar = () => {
   return (
@@ -14,11 +15,14 @@ const Navbar = () => {
         <Link href="/" className="mr-5 hover:text-secondary">
           About
         </Link>
+        <Link href="/doctors" className="mr-5 hover:text-secondary">
+          For Doctors
+        </Link>
         <Link href="/" className="mr-5 hover:text-secondary">
           Blog
         </Link>
       </div>
-      <button>hi</button>
+      <ConnectKitButton />
     </div>
   );
 };

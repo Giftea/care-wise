@@ -3,7 +3,7 @@ import React from "react";
 
 const Hero = () => {
   return (
-    <div className="mt-[110px] section-padding grid grid-cols-3 h-[85vh] pt-10 bg-grey">
+    <div className="section-padding grid grid-cols-3 h-[85vh] pt-10 bg-grey">
       <div className="col-span-2 ">
         {" "}
         <p className="text-muted font-semibold text-7xl leading-tight">
