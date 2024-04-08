@@ -5,7 +5,7 @@ import Header from "@/components/common/header";
 import { WagmiProvider } from "wagmi";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ConnectKitProvider } from "connectkit";
-import { config } from "@/config";
+import { config } from "@/lib/config";
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
