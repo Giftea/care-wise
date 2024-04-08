@@ -1,17 +1,17 @@
 import { getDefaultConfig } from "connectkit";
-import { polygonMumbai } from "viem/chains";
+import { etherlinkTestnet } from "viem/chains";
 import { createConfig, http } from "wagmi";
 
 const projectId = process.env["NEXT_PUBLIC_PROJECT_ID"] ?? "";
 
 export const config = createConfig(
   getDefaultConfig({
-    appName: "shadow-tokens",
+    appName: "care-wise",
     walletConnectProjectId: projectId,
-    chains: [polygonMumbai],
+    chains: [etherlinkTestnet],
     ssr: true,
     transports: {
-      [polygonMumbai.id]: http("https://rpc-mumbai.maticvigil.com"),
+      [etherlinkTestnet.id]: http("https://node.ghostnet.etherlink.com"),
     },
     appDescription:
       "",

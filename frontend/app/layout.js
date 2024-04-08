@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
                 "--ck-connectbutton-background": "#2e279d",
                 "--ck-connectbutton-padding": "2rem",
                 "--ck-connectbutton-border-radius": "0.5rem",
-                "--ck-connectbutton-hover-background": "#499afa",
+                "--ck-connectbutton-hover-background": "#0e204d",
               }}
             >
               <Header />
