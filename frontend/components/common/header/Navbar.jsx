@@ -9,17 +9,14 @@ const Navbar = () => {
         <img src="/images/logo.jpg" width={150} />
       </Link>
       <div className="nav-links">
-        <Link href="/" className="mr-5 hover:text-secondary">
-          Find Doctors
+        <Link href="/" className="mr-10 hover:text-secondary">
+          Find a Doctor
         </Link>
-        <Link href="/" className="mr-5 hover:text-secondary">
-          About
+        <Link href="/doctors" className="mr-10 hover:text-secondary">
+          For Healthcare Providers
         </Link>
-        <Link href="/doctors" className="mr-5 hover:text-secondary">
-          For Doctors
-        </Link>
-        <Link href="/" className="mr-5 hover:text-secondary">
-          Blog
+        <Link href="/" className="mr-10 hover:text-secondary">
+          Articles
         </Link>
       </div>
       <ConnectKitButton />

@@ -30,6 +30,9 @@ module.exports = {
         grey: {
           DEFAULT: "var(--color-grey)"
         },
+        textgrey: {
+          DEFAULT: "var(--text-grey)"
+        },
         secondary: {
           DEFAULT: "var(--secondary)",
           foreground: "hsl(var(--secondary-foreground))",
