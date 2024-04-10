@@ -94,3 +94,37 @@
 input {
   outline: none;
 }
+
+.ReactTags__tagInputField {
+  border: 1px solid hsl(214.3 31.8% 91.4%);
+  padding: 0.5rem 0.75rem;
+  border-radius: 5px;
+  width: 100%;
+}
+.ReactTags__suggestions {
+  background-color: #f3f5f8;
+  cursor: pointer;
+}
+
+.ReactTags__suggestions ul li {
+  border-bottom: 1px solid #595b5f19;
+  padding: 0.5rem 0.75rem;
+}
+
+.ReactTags__selected {
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 2px;
+}
+
+.ReactTags__tag {
+  padding: 0.5rem;
+  background-color: #4750614e;
+  border-radius: 5px;
+  margin-right: 5px;
+}
+
+.ReactTags__remove {
+  padding: 0.2rem 0.5rem;
+  font-size: 18px;
+  font-weight: bold;
+}

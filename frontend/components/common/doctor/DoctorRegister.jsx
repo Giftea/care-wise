@@ -7,10 +7,13 @@ import { Input } from "@/components/ui/input";
 import PhoneInput from "react-phone-number-input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { language_suggestions, specialization_suggestions } from "@/lib/data";
+import { WithContext as ReactTags } from "react-tag-input";
 
 const DoctorRegister = () => {
   const [CID, setCID] = useState("");
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(2);
   const { writeContractAsync: doctorRegistrationCall } = useWriteContract();
 
   const handleSubmit = async (e) => {
@@ -193,6 +196,34 @@ const AcademicDetails = ({ setStep }) => {
 };
 
 const ProfessionalDetails = ({ setStep }) => {
+  const [language_tags, setLanguageTags] = useState([]);
+  const [specialization_tags, setSpecializationTags] = useState([]);
+  console.log("specialization_tags", specialization_tags);
+  console.log("language_tags", language_tags);
+  const handleDelete = (i) => {
+    setLanguageTags(language_tags.filter((tag, index) => index !== i));
+  };
+  const handleSpecializationDelete = (i) => {
+    setSpecializationTags(
+      specialization_tags.filter((tag, index) => index !== i)
+    );
+  };
+
+  const handleAddition = (tag) => {
+    setLanguageTags([...language_tags, tag]);
+  };
+
+  const handleSpecializationAddition = (tag) => {
+    setSpecializationTags([...specialization_tags, tag]);
+  };
+
+  const KeyCodes = {
+    comma: 188,
+    enter: 13,
+  };
+
+  const delimiters = [KeyCodes.comma, KeyCodes.enter];
+
   return (
     <>
       <p className="text-3xl mb-5 font-semibold">Professional Details</p>
@@ -200,7 +231,7 @@ const ProfessionalDetails = ({ setStep }) => {
       <form>
         <div className="mb-3">
           <Label>Short Bio</Label>
-          <Input type="string" id="bio" placeholder="Bio" />
+          <Textarea type="string" id="bio" placeholder="Bio" />
         </div>
         <div className="mb-3">
           <Label>Years of Experience</Label>
@@ -214,11 +245,29 @@ const ProfessionalDetails = ({ setStep }) => {
           <Label>
             Please choose the languages you are comfortable communicating in.
           </Label>
-          <Input type="string" id="name" placeholder="Name" />
+          <ReactTags
+            tags={language_tags}
+            suggestions={language_suggestions}
+            delimiters={delimiters}
+            handleDelete={handleDelete}
+            handleAddition={handleAddition}
+            inputFieldPosition="bottom"
+            autocomplete
+            placeholder="Choose languages"
+          />
         </div>
         <div className="mb-3">
           <Label>Specialties</Label>
-          <Input type="string" id="name" placeholder="Name" />
+          <ReactTags
+            tags={specialization_tags}
+            suggestions={specialization_suggestions}
+            delimiters={delimiters}
+            handleDelete={handleSpecializationDelete}
+            handleAddition={handleSpecializationAddition}
+            inputFieldPosition="bottom"
+            autocomplete
+            placeholder="Choose your specialties"
+          />
         </div>
         <div className="mb-3">
           <Label>Medical Registration Number</Label>
