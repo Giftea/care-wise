@@ -1,4 +1,5 @@
 "use client";
+import 'react-phone-number-input/style.css'
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/common/header";

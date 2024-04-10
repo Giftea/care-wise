@@ -5,7 +5,7 @@ const Hero = ({ title, subTitle, subTitle2, image, children }) => {
     <div className="section-padding grid grid-cols-3 gap-4 h-[85vh] pt-10 bg-grey">
       <div className="col-span-2 pt-20 pr-10">
         {" "}
-        <p className="text-muted font-semibold text-7xl leading-tight">
+        <p className="text-muted font-semibold text-7xl leading-tight capitalize">
           {title}
         </p>
         <p className="text-xl mt-10 text-textgrey w-3/4">{subTitle}</p>
