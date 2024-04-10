@@ -4,7 +4,7 @@ import { ConnectKitButton } from "connectkit";
 
 const Navbar = () => {
   return (
-    <div className="bg-white section-padding py-4 flex justify-between items-center fixed w-[100vw] top-0 shadow">
+    <div className="bg-white section-padding py-4 flex justify-between items-center fixed w-[100vw] top-0 shadow z-[1000]">
       <Link href="/">
         <img src="/images/logo.jpg" width={150} />
       </Link>

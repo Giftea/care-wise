@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 
 const DoctorRegister = () => {
   const [CID, setCID] = useState("");
+  const [step, setStep] = useState(0);
   const { writeContractAsync: doctorRegistrationCall } = useWriteContract();
 
   const handleSubmit = async (e) => {
@@ -59,19 +60,15 @@ const DoctorRegister = () => {
       </div>
 
       <div className="col-span- bg-white rounded p-10">
-        <PersonalDetails />
+        {step === 0 ? (
+          <PersonalDetails setStep={setStep} />
+        ) : step === 1 ? (
+          <AcademicDetails setStep={setStep} />
+        ) : step === 2 ? (
+          <ProfessionalDetails setStep={setStep} />
+        ) : null}
       </div>
-      {/* 
-      name
-      bio
-      specialization
-      yearsofexperience
-      academics [school name, degree, yearofgrad, certficate]
-      supporting documents
-
-      
-      
-      
+      {/*  
       <form onSubmit={handleSubmit}>
         <input
           name="cid"
@@ -89,7 +86,7 @@ const DoctorRegister = () => {
 
 export default DoctorRegister;
 
-const PersonalDetails = () => {
+const PersonalDetails = ({ setStep }) => {
   const [value, setValue] = useState();
   return (
     <>
@@ -146,16 +143,100 @@ const PersonalDetails = () => {
             </div>
           </RadioGroup>
         </div>
-        <Button className="w-full mt-8">Submit</Button>
+        <Button className="mt-8" onClick={() => setStep(1)}>
+          Next
+        </Button>
       </form>
     </>
   );
 };
 
+const AcademicDetails = ({ setStep }) => {
+  return (
+    <>
+      <p className="text-3xl mb-5 font-semibold">Academic Details</p>
 
-const AcademicDetails = () => { 
+      <form>
+        <div className="mb-3">
+          <Label>Course</Label>
+          <Input type="string" id="name" placeholder="Name" />
+        </div>
+        <div className="mb-3">
+          <Label>Year</Label>
+          <Input type="number" id="year" placeholder="Graduation Year" />
+        </div>
+        <div className="mb-3">
+          <Label>Degree</Label>
+          <Input type="string" id="name" placeholder="Name" />
+        </div>
+        <div className="mb-3">
+          <Label>College</Label>
+          <Input type="string" id="name" placeholder="Enter College" />
+        </div>
+        <div className="mb-3">
+          <Label>Certificate</Label>
+          <Input type="file" id="certificate" />
+        </div>
+        <Button
+          className="mt-8 text-white mr-5"
+          variant="secondary"
+          onClick={() => setStep(0)}
+        >
+          Prev
+        </Button>
+        <Button className="mt-8" onClick={() => setStep(2)}>
+          Next
+        </Button>
+      </form>
+    </>
+  );
+};
 
-    return (
-        <></>
-    )
-}
+const ProfessionalDetails = ({ setStep }) => {
+  return (
+    <>
+      <p className="text-3xl mb-5 font-semibold">Professional Details</p>
+
+      <form>
+        <div className="mb-3">
+          <Label>Short Bio</Label>
+          <Input type="string" id="bio" placeholder="Bio" />
+        </div>
+        <div className="mb-3">
+          <Label>Years of Experience</Label>
+          <Input
+            type="number"
+            id="experience"
+            placeholder="Enter years of practice"
+          />
+        </div>
+        <div className="mb-3">
+          <Label>
+            Please choose the languages you are comfortable communicating in.
+          </Label>
+          <Input type="string" id="name" placeholder="Name" />
+        </div>
+        <div className="mb-3">
+          <Label>Specialties</Label>
+          <Input type="string" id="name" placeholder="Name" />
+        </div>
+        <div className="mb-3">
+          <Label>Medical Registration Number</Label>
+          <Input
+            type="number"
+            id="reg-number"
+            placeholder="Fill your Medical Registration Number"
+          />
+        </div>
+        <Button
+          className="mt-8 text-white mr-5"
+          variant="secondary"
+          onClick={() => setStep(1)}
+        >
+          Prev
+        </Button>
+        <Button className="mt-8">Submit</Button>
+      </form>
+    </>
+  );
+};

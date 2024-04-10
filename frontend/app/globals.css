@@ -91,6 +91,6 @@
   box-shadow: 1px 1px 7px 2px #0e204d43;
 }
 
-.PhoneInputInput {
-
+input {
+  outline: none;
 }
