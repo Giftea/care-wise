@@ -7,23 +7,27 @@ import { doctorRegistrationDeployment } from "@/lib/config";
 export const UserContext = createContext();
 
 export function User({ children }) {
-  const [isProfileReceived, setProfileReceived] = useState();
+  const [isProfileReceived, setProfileReceived] = useState(false);
   const [isDoctorRegistered, setIsDoctorRegistered] = useState();
-  const { address } = useAccount();
-
+  const { address, status } = useAccount();
   const result = useReadContract({
     abi: doctorRegistrationABI,
     address: doctorRegistrationDeployment,
     functionName: "doctors",
     args: [address],
   });
-const data = result.data
+  const data = result?.status === "success" ? result.data : null;
 
-console.log(data)
+
+  if (status === 'connected' ) {
+
+  }
 
   useEffect(() => {
-   setProfileReceived(result?.data)
-  }, [result]);
+    // result?.status === "success"
+    //   ? setProfileReceived(data[1])
+    //   : setProfileReceived(false);
+  }, []);
 
   return (
     <UserContext.Provider

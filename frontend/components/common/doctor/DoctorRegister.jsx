@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
+import React, { useEffect } from "react";
 import { doctorRegistrationDeployment } from "@/lib/config";
 import { useState } from "react";
-import { useAccount, useWriteContract } from "wagmi";
+import { useAccount, useWriteContract, useReadContract } from "wagmi";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import PhoneInput from "react-phone-number-input";
@@ -15,10 +15,10 @@ import Spinner from "../Spinner";
 import { uploadFileToIPFS, uploadJSONToIPFS } from "@/lib/pinata";
 import { useToast } from "@/components/ui/use-toast";
 import { doctorRegistrationABI } from "@/lib/abis";
-import { UserContext } from "@/app/userContext";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 
 const DoctorRegister = () => {
-  const { isProfileReceived, setProfileReceived } = useContext(UserContext);
+  const [isProfileReceived, setProfileReceived] = useState(false);
   const { toast } = useToast();
   const [disabled, setDisabled] = useState(true);
   const [imageCID, setImageCID] = useState("");
@@ -27,13 +27,28 @@ const DoctorRegister = () => {
   const [mobile, setMobile] = useState();
   const [language_tags, setLanguageTags] = useState([]);
   const [specialization_tags, setSpecializationTags] = useState([]);
-  const { status } = useAccount();
+  const { status, address } = useAccount();
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm();
+  const result = useReadContract({
+    abi: doctorRegistrationABI,
+    address: doctorRegistrationDeployment,
+    functionName: "doctors",
+    args: [address],
+  });
+
+  useEffect(() => {
+    if (status === "connected" && result.isSuccess) {
+      const data = result?.data;
+      if (data && data.length > 1) {
+        setProfileReceived(data[1]);
+      }
+    }
+  }, [isProfileReceived, result]);
 
   function triggerToast(title = "", desc, variant = "default") {
     toast({
@@ -103,9 +118,7 @@ const DoctorRegister = () => {
         functionName: "receiveDoctorProfile",
         args: [CID],
       });
-
-      console.log(tx);
-
+      setProfileReceived(true);
       reset();
       setCertCID("");
       setImageCID("");
@@ -124,7 +137,6 @@ const DoctorRegister = () => {
       //upload the metadata JSON to IPFS
       const response = await uploadJSONToIPFS(doctorDataJSON);
       if (response.success === true) {
-        console.log("Uploaded JSON to Pinata: ", response);
         const hash = response.ipfsHash;
         await sendDoctorProfile(hash);
 
@@ -163,10 +175,13 @@ const DoctorRegister = () => {
       </div>
 
       {status === "connected" ? (
-        isProfileReceived[1] ? (
-          <div className="col-span-1 bg-white rounded p-10">
+        isProfileReceived ? (
+          <div className="col-span-1 flex flex-col items-center bg-white rounded p-10">
             {" "}
-            <p className="text-3xl mb-5 font-semibold">Profile Successfully Received!</p>
+            <p className="text-3xl mb-5 font-semibold">
+              Profile Successfully Received!
+            </p>
+            <IoMdCheckmarkCircleOutline size={100} color="#0ea573" />
           </div>
         ) : (
           <div className="col-span-1 bg-white rounded p-10">
@@ -373,6 +388,7 @@ const DoctorRegister = () => {
                           handleAddition={handleAddition}
                           inputFieldPosition="bottom"
                           autocomplete
+                          placeholder="Choose languages"
                         />
                       </div>
                       <div className="mb-3">
