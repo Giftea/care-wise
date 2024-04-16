@@ -24,7 +24,7 @@ const DoctorRegister = () => {
   const [mobile, setMobile] = useState();
   const [language_tags, setLanguageTags] = useState([]);
   const [specialization_tags, setSpecializationTags] = useState([]);
-  const { status } = useAccount();
+  const { status, address } = useAccount();
   const [fileURL, setFileURL] = useState(null);
   const {
     register,
@@ -79,10 +79,10 @@ const DoctorRegister = () => {
       if (response.success === true) {
         setFileURL(response.pinataURL);
         if (e.target.id === "photo") {
-          setImageCID(response.ipfsHash);
+          setImageCID(response.pinataURL);
           triggerToast("Success!", "File uploaded to IPFS", "success");
         } else if (e.target.id === "certificate") {
-          setCertCID(response.ipfsHash);
+          setCertCID(response.pinataURL);
           triggerToast("Success!", "File uploaded to IPFS", "success");
           setDisabled(false);
         } else {
@@ -100,11 +100,12 @@ const DoctorRegister = () => {
         abi,
         address: deployment,
         functionName: "receiveDoctorProfile",
-        args: [CID],
+        args: [address, CID],
       });
 
       console.log(tx);
       reset();
+      triggerToast("Success!", "Profile successfully submitted", "success");
     } catch (error) {
       console.log(error);
     }
