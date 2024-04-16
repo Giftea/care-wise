@@ -1,5 +1,5 @@
 import React from "react";
-import { deployment, abi } from "@/lib/config";
+import { doctorRegistrationDeployment } from "@/lib/config";
 import { useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ import { ConnectKitButton } from "connectkit";
 import Spinner from "../Spinner";
 import { uploadFileToIPFS, uploadJSONToIPFS } from "@/lib/pinata";
 import { useToast } from "@/components/ui/use-toast";
+import { doctorRegistrationABI } from "@/lib/abis";
 
 const DoctorRegister = () => {
   const { toast } = useToast();
@@ -25,7 +26,6 @@ const DoctorRegister = () => {
   const [language_tags, setLanguageTags] = useState([]);
   const [specialization_tags, setSpecializationTags] = useState([]);
   const { status, address } = useAccount();
-  const [fileURL, setFileURL] = useState(null);
   const {
     register,
     handleSubmit,
@@ -77,7 +77,6 @@ const DoctorRegister = () => {
 
       const response = await uploadFileToIPFS(file);
       if (response.success === true) {
-        setFileURL(response.pinataURL);
         if (e.target.id === "photo") {
           setImageCID(response.pinataURL);
           triggerToast("Success!", "File uploaded to IPFS", "success");
@@ -97,13 +96,14 @@ const DoctorRegister = () => {
   const sendDoctorProfile = async (CID) => {
     try {
       const tx = await doctorRegistrationCall({
-        abi,
-        address: deployment,
+        abi: doctorRegistrationABI,
+        address: doctorRegistrationDeployment,
         functionName: "receiveDoctorProfile",
-        args: [address, CID],
+        args: [CID],
       });
 
       console.log(tx);
+
       reset();
       triggerToast("Success!", "Profile successfully submitted", "success");
     } catch (error) {
@@ -118,7 +118,8 @@ const DoctorRegister = () => {
       const response = await uploadJSONToIPFS(doctorDataJSON);
       if (response.success === true) {
         console.log("Uploaded JSON to Pinata: ", response);
-        await sendDoctorProfile(response.ipfsHash);
+        const hash =response.ipfsHash;
+        await sendDoctorProfile(hash);
 
         return response.pinataURL;
       }

@@ -5,7 +5,7 @@ describe("DoctorRegistration", function() {
   let owner;
   let addr1;
   let addr2;
-  let userDataCID = "CID123456";
+  let userDataCID = "QmTogUKwiiyfZRwnLfHaxMwiqjrz836XKuH8Ud3C6zMqBq";
 
   beforeEach(async function() {
     doctorRegistration = await ethers.deployContract("DoctorRegistration");

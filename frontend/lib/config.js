@@ -3,7 +3,9 @@ import { etherlinkTestnet } from "viem/chains";
 import { createConfig, http } from "wagmi";
 
 const projectId = process.env["NEXT_PUBLIC_PROJECT_ID"] ?? "";
-export const deployment = "0x20DD91f17c81E39d242913C6583df9B8ca1B7223";
+export const doctorRegistrationDeployment = process.env["NEXT_PUBLIC_DOCTOR_REG_CONTRACT"] ?? "0xa8c564fA8Ebd7d0e79515BBd13Efa63eE83d6cA6";
+export const patientRegistrationDeployment = process.env["NEXT_PUBLIC_PATIENT_REG_CONTRACT"] ?? "";
+export const appointmentBookingDeployment = process.env["NEXT_PUBLIC_APPOINTMENT_CONTRACT"] ?? "";
 export const chainId = 128123;
 
 export const config = createConfig(
