@@ -13,15 +13,29 @@ async function deployMyContract() {
   );
   await PatientRegistrationContract.waitForDeployment();
 
-    // AppointmentBooking
-    const AppointmentBookingContract = await ethers.deployContract(
-      "AppointmentBooking"
-    );
-    await AppointmentBookingContract.waitForDeployment();
+  // AppointmentBooking
+  const AppointmentBookingContract = await ethers.deployContract(
+    "AppointmentBooking"
+  );
+  await AppointmentBookingContract.waitForDeployment();
+
+  // Doctor
+  const DoctorContract = await ethers.deployContract(
+    "Doctor"
+  );
+  await DoctorContract.waitForDeployment();
+
+  // Patient
+  const PatientContract = await ethers.deployContract(
+    "Patient"
+  );
+  await PatientContract.waitForDeployment();
 
   console.log("DoctorRegistration", DoctorRegistrationContract);
   console.log("PatientRegistration", PatientRegistrationContract);
   console.log("AppointmentBooking", AppointmentBookingContract);
+  console.log("Doctor", DoctorContract);
+  console.log("Patient", PatientContract);
 }
 
 deployMyContract().catch((error) => {
