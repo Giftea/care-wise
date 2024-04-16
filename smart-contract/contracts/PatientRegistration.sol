@@ -14,15 +14,6 @@ contract PatientRegistration {
     
     event PatientRegistered(address indexed patientAddress, bytes32 userID, string userDataCID);
     
-    constructor() {
-        owner = msg.sender;
-    }
-    
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Only owner can call this function");
-        _;
-    }
-    
     function registerPatient(bytes32 _userID, string memory _userDataCID) external {
         require(_userID != 0, "User ID cannot be empty");
         require(bytes(_userDataCID).length > 0, "User data CID cannot be empty");
