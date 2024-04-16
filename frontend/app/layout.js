@@ -7,6 +7,8 @@ import { WagmiProvider } from "wagmi";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ConnectKitProvider } from "connectkit";
 import { config } from "@/lib/config";
+import { Toaster } from "@/components/ui/toaster";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({ children }) {
@@ -27,6 +29,7 @@ export default function RootLayout({ children }) {
             >
               <Header />
               <div className="mt-[110px]">{children}</div>
+              <Toaster />
             </ConnectKitProvider>
           </QueryClientProvider>
         </WagmiProvider>

@@ -128,3 +128,9 @@ input {
   font-size: 18px;
   font-weight: bold;
 }
+
+.error-text {
+  color: rgb(245, 133, 133);
+  font-size: 12px;
+  margin: 2px 0;
+}
