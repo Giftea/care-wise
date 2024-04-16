@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { doctorRegistrationDeployment } from "@/lib/config";
 import { useState } from "react";
 import { useAccount, useWriteContract } from "wagmi";
@@ -15,8 +15,10 @@ import Spinner from "../Spinner";
 import { uploadFileToIPFS, uploadJSONToIPFS } from "@/lib/pinata";
 import { useToast } from "@/components/ui/use-toast";
 import { doctorRegistrationABI } from "@/lib/abis";
+import { UserContext } from "@/app/userContext";
 
 const DoctorRegister = () => {
+  const { isProfileReceived, setProfileReceived } = useContext(UserContext);
   const { toast } = useToast();
   const [disabled, setDisabled] = useState(true);
   const [imageCID, setImageCID] = useState("");
@@ -25,7 +27,7 @@ const DoctorRegister = () => {
   const [mobile, setMobile] = useState();
   const [language_tags, setLanguageTags] = useState([]);
   const [specialization_tags, setSpecializationTags] = useState([]);
-  const { status, address } = useAccount();
+  const { status } = useAccount();
   const {
     register,
     handleSubmit,
@@ -41,7 +43,7 @@ const DoctorRegister = () => {
     });
   }
 
-  // Profeesional details
+  // Professional details
   const handleDelete = (i) => {
     setLanguageTags(language_tags.filter((tag, index) => index !== i));
   };
@@ -105,6 +107,11 @@ const DoctorRegister = () => {
       console.log(tx);
 
       reset();
+      setCertCID("");
+      setImageCID("");
+      setSpecializationTags([]);
+      setLanguageTags([]);
+      setDisabled(true);
       triggerToast("Success!", "Profile successfully submitted", "success");
     } catch (error) {
       console.log(error);
@@ -118,7 +125,7 @@ const DoctorRegister = () => {
       const response = await uploadJSONToIPFS(doctorDataJSON);
       if (response.success === true) {
         console.log("Uploaded JSON to Pinata: ", response);
-        const hash =response.ipfsHash;
+        const hash = response.ipfsHash;
         await sendDoctorProfile(hash);
 
         return response.pinataURL;
@@ -156,245 +163,261 @@ const DoctorRegister = () => {
       </div>
 
       {status === "connected" ? (
-        <div className="col-span-1 bg-white rounded p-10">
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <>
-              <p className="text-3xl mb-5 font-semibold">Personal Details</p>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="mb-3">
-                  <Label>Name</Label>
-                  <Input
-                    type="string"
-                    id="name"
-                    placeholder="Name"
-                    {...register("name", { required: true })}
-                  />
-                  {errors.name?.type === "required" && (
-                    <p className="error-text" role="alert">
-                      Name is required
-                    </p>
-                  )}
-                </div>
-
-                <div className="mb-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    type="email"
-                    id="email"
-                    placeholder="Email"
-                    {...register("email", { required: true })}
-                  />
-                  {errors.email?.type === "required" && (
-                    <p className="error-text" role="alert">
-                      Email is required
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="mb-3">
-                <Label>Profile Photo</Label>
-                <Input
-                  type="file"
-                  id="photo"
-                  required
-                  onChange={OnChangeFile}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                {" "}
-                <div className="mb-3">
-                  <Label>Mobile</Label>
-                  <PhoneInput
-                    placeholder="Enter phone number"
-                    value={mobile}
-                    id="mobile"
-                    name="mobile"
-                    onChange={setMobile}
-                    className="rounded border-2 py-2 px-3"
-                    {...register("mobile", { required: true })}
-                  />
-                  {errors.mobile?.type === "required" && (
-                    <p className="error-text" role="alert">
-                      Mobile number is required
-                    </p>
-                  )}
-                </div>
-                <div className="mb-6">
-                  <Label>Date of Birth</Label>
-                  <Input type="date" {...register("dob", { required: true })} />
-                  {errors.dob?.type === "required" && (
-                    <p className="error-text" role="alert">
-                      Date of Birth is required
-                    </p>
-                  )}
-                </div>
-              </div>
-
+        isProfileReceived[1] ? (
+          <div className="col-span-1 bg-white rounded p-10">
+            {" "}
+            <p className="text-3xl mb-5 font-semibold">Profile Successfully Received!</p>
+          </div>
+        ) : (
+          <div className="col-span-1 bg-white rounded p-10">
+            <form onSubmit={handleSubmit(onSubmit)}>
               <>
-                <p className="text-3xl mb-5 font-semibold">Academic Details</p>
-
-                <>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="mb-3">
-                      <Label>Course</Label>
-                      <Input
-                        type="string"
-                        id="name"
-                        placeholder="Course title"
-                        {...register("course", { required: true })}
-                      />
-                      {errors.course?.type === "required" && (
-                        <p className="error-text" role="alert">
-                          Course is required
-                        </p>
-                      )}
-                    </div>
-                    <div className="mb-3">
-                      <Label>Year</Label>
-                      <Input
-                        type="number"
-                        id="graduationYear"
-                        placeholder="Graduation Year"
-                        {...register("graduationYear", { required: true })}
-                      />
-                      {errors.graduationYear?.type === "required" && (
-                        <p className="error-text" role="alert">
-                          Graduation Year is required
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="mb-3">
-                      <Label>Degree</Label>
-                      <select
-                        id="degree"
-                        {...register("degree", { required: true })}
-                        className="w-full rounded border-2 py-2 px-3"
-                      >
-                        <option value=""> Select degree type</option>
-                        <option value="mbbs">MBBS</option>
-                        <option value="msc">Msc</option>
-                        <option value="doctorate">Doctorate</option>
-                      </select>
-                      {errors.degree?.type === "required" && (
-                        <p className="error-text" role="alert">
-                          Degree is required
-                        </p>
-                      )}
-                    </div>
-                    <div className="mb-3">
-                      <Label>College</Label>
-                      <Input
-                        type="string"
-                        id="college"
-                        placeholder="Enter College"
-                        {...register("college", { required: true })}
-                      />
-                      {errors.college?.type === "required" && (
-                        <p className="error-text" role="alert">
-                          College is required
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
+                <p className="text-3xl mb-5 font-semibold">Personal Details</p>
+                <div className="grid grid-cols-2 gap-2">
                   <div className="mb-3">
-                    <Label>Certificate</Label>
+                    <Label>Name</Label>
                     <Input
-                      type="file"
-                      id="certificate"
-                      onChange={OnChangeFile}
-                      required
+                      type="string"
+                      id="name"
+                      placeholder="Name"
+                      {...register("name", { required: true })}
                     />
-                  </div>
-                </>
-              </>
-              <>
-                <p className="text-3xl mb-5 font-semibold">
-                  Professional Details
-                </p>
-
-                <>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="mb-3">
-                      <Label>Short Bio</Label>
-                      <Textarea
-                        type="string"
-                        id="bio"
-                        placeholder="Bio"
-                        {...register("bio")}
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <Label>Years of Experience</Label>
-                      <input
-                        type="number"
-                        className="rounded border-2 py-2 px-3 w-full"
-                        id="experience"
-                        placeholder="Enter years of practice"
-                        {...register("experience")}
-                      />
-                    </div>
-                  </div>
-
-                  <>
-                    <div className="mb-3">
-                      <Label>
-                        Please choose the languages you are comfortable
-                        communicating in.
-                      </Label>
-                      <ReactTags
-                        tags={language_tags}
-                        suggestions={language_suggestions}
-                        delimiters={delimiters}
-                        handleDelete={handleDelete}
-                        handleAddition={handleAddition}
-                        inputFieldPosition="bottom"
-                        autocomplete
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <Label>Specialties</Label>
-                      <ReactTags
-                        tags={specialization_tags}
-                        suggestions={specialization_suggestions}
-                        delimiters={delimiters}
-                        handleDelete={handleSpecializationDelete}
-                        handleAddition={handleSpecializationAddition}
-                        inputFieldPosition="bottom"
-                        autocomplete
-                        placeholder="Choose your specialties"
-                      />
-                    </div>
-                  </>
-
-                  <div className="mb-6 w-[50%]">
-                    <Label>Medical Registration Number</Label>
-                    <Input
-                      type="number"
-                      id="regNumber"
-                      placeholder="Fill your Medical Registration Number"
-                      {...register("regNumber", { required: true })}
-                    />
-                    {errors.regNumber?.type === "required" && (
+                    {errors.name?.type === "required" && (
                       <p className="error-text" role="alert">
-                        Medical Registration Number is required
+                        Name is required
                       </p>
                     )}
                   </div>
 
-                  <Button disabled={disabled} className="w-full" type="submit">
-                    Submit
-                  </Button>
+                  <div className="mb-3">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      type="email"
+                      id="email"
+                      placeholder="Email"
+                      {...register("email", { required: true })}
+                    />
+                    {errors.email?.type === "required" && (
+                      <p className="error-text" role="alert">
+                        Email is required
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mb-3">
+                  <Label>Profile Photo</Label>
+                  <Input
+                    type="file"
+                    id="photo"
+                    required
+                    onChange={OnChangeFile}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {" "}
+                  <div className="mb-3">
+                    <Label>Mobile</Label>
+                    <PhoneInput
+                      placeholder="Enter phone number"
+                      value={mobile}
+                      id="mobile"
+                      name="mobile"
+                      onChange={setMobile}
+                      className="rounded border-2 py-2 px-3"
+                      {...register("mobile", { required: true })}
+                    />
+                    {errors.mobile?.type === "required" && (
+                      <p className="error-text" role="alert">
+                        Mobile number is required
+                      </p>
+                    )}
+                  </div>
+                  <div className="mb-6">
+                    <Label>Date of Birth</Label>
+                    <Input
+                      type="date"
+                      {...register("dob", { required: true })}
+                    />
+                    {errors.dob?.type === "required" && (
+                      <p className="error-text" role="alert">
+                        Date of Birth is required
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <>
+                  <p className="text-3xl mb-5 font-semibold">
+                    Academic Details
+                  </p>
+
+                  <>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="mb-3">
+                        <Label>Course</Label>
+                        <Input
+                          type="string"
+                          id="name"
+                          placeholder="Course title"
+                          {...register("course", { required: true })}
+                        />
+                        {errors.course?.type === "required" && (
+                          <p className="error-text" role="alert">
+                            Course is required
+                          </p>
+                        )}
+                      </div>
+                      <div className="mb-3">
+                        <Label>Year</Label>
+                        <Input
+                          type="number"
+                          id="graduationYear"
+                          placeholder="Graduation Year"
+                          {...register("graduationYear", { required: true })}
+                        />
+                        {errors.graduationYear?.type === "required" && (
+                          <p className="error-text" role="alert">
+                            Graduation Year is required
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="mb-3">
+                        <Label>Degree</Label>
+                        <select
+                          id="degree"
+                          {...register("degree", { required: true })}
+                          className="w-full rounded border-2 py-2 px-3"
+                        >
+                          <option value=""> Select degree type</option>
+                          <option value="mbbs">MBBS</option>
+                          <option value="msc">Msc</option>
+                          <option value="doctorate">Doctorate</option>
+                        </select>
+                        {errors.degree?.type === "required" && (
+                          <p className="error-text" role="alert">
+                            Degree is required
+                          </p>
+                        )}
+                      </div>
+                      <div className="mb-3">
+                        <Label>College</Label>
+                        <Input
+                          type="string"
+                          id="college"
+                          placeholder="Enter College"
+                          {...register("college", { required: true })}
+                        />
+                        {errors.college?.type === "required" && (
+                          <p className="error-text" role="alert">
+                            College is required
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="mb-3">
+                      <Label>Certificate</Label>
+                      <Input
+                        type="file"
+                        id="certificate"
+                        onChange={OnChangeFile}
+                        required
+                      />
+                    </div>
+                  </>
+                </>
+                <>
+                  <p className="text-3xl mb-5 font-semibold">
+                    Professional Details
+                  </p>
+
+                  <>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="mb-3">
+                        <Label>Short Bio</Label>
+                        <Textarea
+                          type="string"
+                          id="bio"
+                          placeholder="Bio"
+                          {...register("bio")}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <Label>Years of Experience</Label>
+                        <input
+                          type="number"
+                          className="rounded border-2 py-2 px-3 w-full"
+                          id="experience"
+                          placeholder="Enter years of practice"
+                          {...register("experience")}
+                        />
+                      </div>
+                    </div>
+
+                    <>
+                      <div className="mb-3">
+                        <Label>
+                          Please choose the languages you are comfortable
+                          communicating in.
+                        </Label>
+                        <ReactTags
+                          tags={language_tags}
+                          suggestions={language_suggestions}
+                          delimiters={delimiters}
+                          handleDelete={handleDelete}
+                          handleAddition={handleAddition}
+                          inputFieldPosition="bottom"
+                          autocomplete
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <Label>Specialties</Label>
+                        <ReactTags
+                          tags={specialization_tags}
+                          suggestions={specialization_suggestions}
+                          delimiters={delimiters}
+                          handleDelete={handleSpecializationDelete}
+                          handleAddition={handleSpecializationAddition}
+                          inputFieldPosition="bottom"
+                          autocomplete
+                          placeholder="Choose your specialties"
+                        />
+                      </div>
+                    </>
+
+                    <div className="mb-6 w-[50%]">
+                      <Label>Medical Registration Number</Label>
+                      <Input
+                        type="number"
+                        id="regNumber"
+                        placeholder="Fill your Medical Registration Number"
+                        {...register("regNumber", { required: true })}
+                      />
+                      {errors.regNumber?.type === "required" && (
+                        <p className="error-text" role="alert">
+                          Medical Registration Number is required
+                        </p>
+                      )}
+                    </div>
+
+                    <Button
+                      disabled={disabled}
+                      className="w-full"
+                      type="submit"
+                    >
+                      Submit
+                    </Button>
+                  </>
                 </>
               </>
-            </>
-          </form>
-        </div>
+            </form>
+          </div>
+        )
       ) : (
         <div className="col-span- bg-white rounded p-10">
           {" "}
@@ -410,18 +433,6 @@ const DoctorRegister = () => {
           </div>
         </div>
       )}
-      {/*
-      <form onSubmit={handleSubmit}>
-        <input
-          name="cid"
-          placeholder="cid"
-          value={CID}
-          onChange={(e) => setCID(e.target.value)}
-        />
-        <input type="submit" />
-      </form>
-
-      <button onClick={()=> getdem()} >get doctor</button> */}
     </div>
   );
 };

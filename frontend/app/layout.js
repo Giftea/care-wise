@@ -1,5 +1,5 @@
 "use client";
-import 'react-phone-number-input/style.css'
+import "react-phone-number-input/style.css";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/common/header";
@@ -8,6 +8,7 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ConnectKitProvider } from "connectkit";
 import { config } from "@/lib/config";
 import { Toaster } from "@/components/ui/toaster";
+import { User } from "./userContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,9 +28,11 @@ export default function RootLayout({ children }) {
                 "--ck-connectbutton-hover-background": "#0e204d",
               }}
             >
-              <Header />
-              <div className="mt-[110px]">{children}</div>
-              <Toaster />
+              <User>
+                <Header />
+                <div className="mt-[110px]">{children}</div>
+                <Toaster />
+              </User>
             </ConnectKitProvider>
           </QueryClientProvider>
         </WagmiProvider>
