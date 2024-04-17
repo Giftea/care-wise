@@ -18,7 +18,7 @@ import { doctorRegistrationABI } from "@/lib/abis";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 
 const DoctorRegister = () => {
-  const [isProfileReceived, setProfileReceived] = useState(false);
+  const [isProfileReceived, setProfileReceived] = useState(null);
   const { toast } = useToast();
   const [disabled, setDisabled] = useState(true);
   const [imageCID, setImageCID] = useState("");
@@ -164,7 +164,10 @@ const DoctorRegister = () => {
   };
 
   return (
-    <div className="section-padding py-10 bg-primary grid grid-cols-2 gap-4">
+    <div
+      id="#docregister"
+      className="section-padding py-10 bg-primary grid grid-cols-2 gap-4"
+    >
       <div>
         <p className="text-secondary uppercase text-l mb-5">
           Register your Healthcare Provider account
@@ -183,7 +186,7 @@ const DoctorRegister = () => {
             </p>
             <IoMdCheckmarkCircleOutline size={100} color="#0ea573" />
           </div>
-        ) : (
+        ) : !isProfileReceived ? (
           <div className="col-span-1 bg-white rounded p-10">
             <form onSubmit={handleSubmit(onSubmit)}>
               <>
@@ -433,6 +436,8 @@ const DoctorRegister = () => {
               </>
             </form>
           </div>
+        ) : (
+          <Spinner loading={true} size={50} />
         )
       ) : (
         <div className="col-span- bg-white rounded p-10">

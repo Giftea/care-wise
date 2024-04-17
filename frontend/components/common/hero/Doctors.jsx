@@ -14,7 +14,9 @@ const DoctorsPageHero = () => {
         "* Provider membership is exclusive to specialist physicians with specializations"
       }
     >
-      <Button className="text-xl p-8">Register Now</Button>
+      <Button className="text-xl p-8">
+        <a href="#docregister">Register Now</a>
+      </Button>
     </Hero>
   );
 };
