@@ -28,7 +28,6 @@ const Doctor = () => {
         (doctor) => doctor.doctorAddress === doctorAddress
       );
       setDoctor(foundDoctor);
-      console.log(doctor);
     }
   }, [result, doctor]);
 
