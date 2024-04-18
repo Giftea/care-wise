@@ -5,6 +5,7 @@ import { doctorRegistrationABI } from "@/lib/abis";
 import { doctorRegistrationDeployment } from "@/lib/config";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 const FindDoctors = () => {
   const [doctors, setDoctors] = useState([]);
@@ -21,6 +22,7 @@ const FindDoctors = () => {
     if (result.isSuccess) {
       setLoading(false);
       setDoctors(result.data);
+      console.log(doctors);
     }
   }, [result, doctors]);
 
@@ -36,7 +38,11 @@ const FindDoctors = () => {
         {!loading ? (
           <>
             {doctors.map((item, index) => (
-              <DoctorCard id={index} CID={item.userDataCID} />
+              <DoctorCard
+                key={index}
+                CID={item.userDataCID}
+                address={item?.doctorAddress}
+              />
             ))}
           </>
         ) : (
@@ -54,7 +60,7 @@ const FindDoctors = () => {
 
 export default FindDoctors;
 
-const DoctorCard = ({ id, CID }) => {
+const DoctorCard = ({ CID, address }) => {
   const [doctor, setDoctor] = useState(null);
   const fetchUser = async () => {
     try {
@@ -78,18 +84,21 @@ const DoctorCard = ({ id, CID }) => {
   }, [doctor]);
 
   return (
-    <div
-      key={id}
-      className="mt-5 bg-white shadow p-8 col-span-2 flex justify-between rounded"
-    >
+    <div className="mt-5 bg-white shadow p-8 col-span-2 flex justify-between rounded">
       <div className="flex">
         <Avatar className="w-[100px] h-[100px]">
-          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarImage src={doctor?.photo} />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
 
         <div className="ml-5">
-          <p className="text-primary text-2xl font-semibold"> {doctor?.name}</p>
+          <Link
+            href={`/doctors/find-doctors/${address}`}
+            className="text-primary text-2xl font-semibold"
+          >
+            {" "}
+            {doctor?.name}
+          </Link>
           <p className="text-textgrey mb-5">{doctor?.course}</p>
           <p>
             Experience:{" "}
@@ -132,7 +141,7 @@ const DoctorCard = ({ id, CID }) => {
   );
 };
 
-const CardSkeleton = () => {
+export const CardSkeleton = () => {
   return (
     <div className="mt-5 bg-white shadow p-8 col-span-2 flex justify-between">
       <div className="flex">

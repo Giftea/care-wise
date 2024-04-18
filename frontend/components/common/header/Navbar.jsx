@@ -18,6 +18,9 @@ const Navbar = () => {
         <Link href="/" className="mr-10 hover:text-secondary">
           Articles
         </Link>
+        <Link href="/" className="mr-10 hover:text-secondary">
+          Dashboard
+        </Link>
       </div>
       <ConnectKitButton />
     </div>

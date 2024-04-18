@@ -11,9 +11,9 @@ const Home = () => {
       }
       image="/images/hero.jpg"
     >
-      <Button className="text-xl p-8">Consult Now</Button>
+      <Button className="text-xl p-8">Register Now</Button>
       <Button variant="secondary" className="ml-6 text-xl p-8 text-white">
-        Find Doctors
+        <a href="/doctors/find-doctors">Find Doctors</a>
       </Button>
     </Hero>
   );
