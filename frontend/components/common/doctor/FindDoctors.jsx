@@ -4,6 +4,7 @@ import { useAccount, useReadContract } from "wagmi";
 import { doctorRegistrationABI } from "@/lib/abis";
 import { doctorRegistrationDeployment } from "@/lib/config";
 import axios from "axios";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const FindDoctors = () => {
   const [doctors, setDoctors] = useState([]);
@@ -38,7 +39,14 @@ const FindDoctors = () => {
               <DoctorCard id={index} CID={item.userDataCID} />
             ))}
           </>
-        ) : null}
+        ) : (
+          <>
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+          </>
+        )}
       </div>
     </div>
   );
@@ -119,6 +127,30 @@ const DoctorCard = ({ id, CID }) => {
         <button className="bg-textgrey text-white p-2 mr-2 rounded my-1 px-10">
           Consult $13
         </button>
+      </div>
+    </div>
+  );
+};
+
+const CardSkeleton = () => {
+  return (
+    <div className="mt-5 bg-white shadow p-8 col-span-2 flex justify-between">
+      <div className="flex">
+        {" "}
+        <Skeleton className="w-[100px] h-[100px] rounded-full" />
+        <div className="ml-5">
+          <Skeleton className="h-4 w-[50px] mb-2" />
+          <Skeleton className="h-4 w-[70px] mb-3" />
+          <Skeleton className="h-4 w-[100px] mb-3 mt-10" />
+          <Skeleton className="h-4 w-[250px] mb-3" />
+          <Skeleton className="h-4 w-[350px] mb-3" />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-[200px] py-4 my-1" />
+        <Skeleton className="h-4 w-[200px py-4 my-1" />
+        <Skeleton className="h-4 w-[200px] py-4 my-1" />
       </div>
     </div>
   );
