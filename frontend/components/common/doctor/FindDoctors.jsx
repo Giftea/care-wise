@@ -1,7 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAccount, useReadContract } from "wagmi";
+import { doctorRegistrationABI } from "@/lib/abis";
+import { doctorRegistrationDeployment } from "@/lib/config";
+import axios from "axios";
 
 const FindDoctors = () => {
+  const [doctors, setDoctors] = useState([]);
+  const { status, address } = useAccount();
+  const [loading, setLoading] = useState(true);
+
+  const result = useReadContract({
+    abi: doctorRegistrationABI,
+    address: doctorRegistrationDeployment,
+    functionName: "getAllRegisteredDoctors",
+  });
+
+  useEffect(() => {
+    if (result.isSuccess) {
+      setLoading(false);
+      setDoctors(result.data);
+    }
+  }, [result, doctors]);
+
   return (
     <div className="section-padding py-10">
       <p>
@@ -11,8 +32,13 @@ const FindDoctors = () => {
       </p>
 
       <div className="grid grid-cols-3">
-        <DoctorCard />
-        <DoctorCard />
+        {!loading ? (
+          <>
+            {doctors.map((item, index) => (
+              <DoctorCard id={index} CID={item.userDataCID} />
+            ))}
+          </>
+        ) : null}
       </div>
     </div>
   );
@@ -20,9 +46,34 @@ const FindDoctors = () => {
 
 export default FindDoctors;
 
-const DoctorCard = () => {
+const DoctorCard = ({ id, CID }) => {
+  const [doctor, setDoctor] = useState(null);
+  const fetchUser = async () => {
+    try {
+      const result = await axios.get(
+        `https://gateway.pinata.cloud/ipfs/${CID}`
+      );
+      if (result?.status === 200) {
+        setDoctor(result?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, [CID]);
+
+  useEffect(() => {
+    console.log(doctor);
+  }, [doctor]);
+
   return (
-    <div className="mt-5 bg-white shadow p-8 col-span-2 flex justify-between rounded">
+    <div
+      key={id}
+      className="mt-5 bg-white shadow p-8 col-span-2 flex justify-between rounded"
+    >
       <div className="flex">
         <Avatar className="w-[100px] h-[100px]">
           <AvatarImage src="https://github.com/shadcn.png" />
@@ -30,21 +81,30 @@ const DoctorCard = () => {
         </Avatar>
 
         <div className="ml-5">
-          <p className="text-primary text-2xl font-semibold">Dr. John</p>
-          <p className="text-textgrey mb-5">MBBS</p>
+          <p className="text-primary text-2xl font-semibold"> {doctor?.name}</p>
+          <p className="text-textgrey mb-5">{doctor?.course}</p>
           <p>
-            Experience: <span className="font-semibold">16+ Yrs</span>
+            Experience:{" "}
+            <span className="font-semibold">{doctor?.experience}+ Yrs</span>
           </p>
           <p>
-            Consulting Languages: <span className="font-semibold">English</span>{" "}
+            Consulting Languages:{" "}
+            <span className="font-semibold">
+              {" "}
+              {doctor?.languages.map((item, index) => (
+                <span key={index}> {item.text}, </span>
+              ))}{" "}
+            </span>{" "}
           </p>
           <div className="mt-5 flex">
-            <span className="border-2 border-[#4999fa53] text-secondary p-2 mr-2 rounded">
-              Family Physician
-            </span>
-            <span className="border-2 border-[#4999fa53] text-secondary p-2 mr-2 rounded">
-              Family Physician
-            </span>
+            {doctor?.specialization.map((item, index) => (
+              <span
+                key={index}
+                className="border-2 border-[#4999fa53] text-secondary p-2 mr-2 rounded"
+              >
+                {item?.text}
+              </span>
+            ))}
           </div>
         </div>
       </div>

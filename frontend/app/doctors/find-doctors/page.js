@@ -1,3 +1,4 @@
+"use client";
 import FindDoctors from "@/components/common/doctor/FindDoctors";
 import React from "react";
 
