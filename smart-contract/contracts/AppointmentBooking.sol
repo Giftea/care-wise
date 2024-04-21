@@ -20,7 +20,6 @@ contract AppointmentBooking {
     event AppointmentRejected(uint indexed appointmentId);
 
     constructor() {
-        // Initialize contract owner as a doctor (for demonstration purposes)
         doctors[msg.sender] = true;
     }
 
@@ -57,22 +56,18 @@ contract AppointmentBooking {
         emit AppointmentRejected(_appointmentId);
     }
 
-    // Function to add a doctor
     function addDoctor(address _doctor) external onlyDoctor {
         doctors[_doctor] = true;
     }
 
-    // Function to add a patient
     function addPatient(address _patient) external onlyDoctor {
         patients[_patient] = true;
     }
 
-    // Function to check if an address is a doctor
     function isDoctor(address _address) external view returns (bool) {
         return doctors[_address];
     }
 
-    // Function to check if an address is a patient
     function isPatient(address _address) external view returns (bool) {
         return patients[_address];
     }

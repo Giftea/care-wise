@@ -10,7 +10,7 @@ contract BillingContract {
 
     struct Service {
         string serviceName;
-        uint256 serviceRate; // Rate of the service in wei
+        uint256 serviceRate;
     }
 
     mapping(string => Service) private services;
