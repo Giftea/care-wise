@@ -4,7 +4,6 @@
 
 Care-wise is a blockchain-based platform designed to bridge the connection between healthcare providers and patients. Leveraging the power of blockchain technology, our platform aims to enhance security, transparency, and efficiency in the healthcare industry.
 
-
 ## Features
 
 - **Doctor Registration:** Register doctors securely on the platform, verifying their credentials and setting up profiles.
